@@ -40,10 +40,90 @@ function reducer(state, {type, payload}) {
             currentOperand: null,
           }
         }
+
+        if (state.currentOperand == null) {
+          return {
+            ...state,
+            operation: payload.operation,
+          }
+        }
+          return{
+            ...state,
+            previousOperand: evaluate(state),
+            operation:payload.operation,
+            currentOperand: null
+          }
+
       case ACTIONS.CLEAR: 
       return{}
+
+      case ACTIONS.DELETE_DIGIT:
+      if (state.overwrite) {
+        return {
+          ...state,
+          overwrite: false,
+          currentOperand: null,
+        }
+      }
+      if (state.currentOperand == null) return state
+      if (state.currentOperand.length === 1) {
+        return { ...state, currentOperand: null }
+      }
+
+      return {
+        ...state,
+        currentOperand: state.currentOperand.slice(0, -1),
+      }
+
+      case ACTIONS.EVALUATE:
+  if (
+    state.operation == null ||
+    state.currentOperand == null ||
+    state.previousOperand == null
+  ) {
+    return state
   }
 
+  return {
+    ...state,
+    overwrite: true,
+    previousOperand: null,
+    operation: null,
+    currentOperand: evaluate(state),
+    }
+  }
+}
+  
+function evaluate({currentOperand, previousOperand, operation}){
+  const prev = parseFloat(previousOperand)
+  const current = parseFloat(currentOperand)
+  if (isNaN(prev) || isNaN(current)) return ''
+  let computation = ""
+  switch (operation) {
+    case "+":
+      computation = prev + current
+      break
+    case "-":
+      computation = prev - current
+      break
+    case "*":
+      computation = prev * current
+      break
+    case "÷":
+      computation = prev / current
+      break
+}
+return computation.toString()
+}
+
+const INTEGER_FORMATTER = new Intl.NumberFormat("en-us", {
+  maximumFractionDigits: 0,
+})
+function formatOperand(operand) {
+  if (operand == null) return
+  const [integer, decimal] = operand.split(".")
+  if (decimal == null) return INTEGER_FORMATTER.format(integer)
+  return `${INTEGER_FORMATTER.format(integer)}.${decimal}`
 }
 
 function App() {
@@ -55,13 +135,15 @@ function App() {
   return (
     <div className="calc-grid">
       <div className="output">
-        <div className="previous-operand"> {previousOperand} {operation} </div>
-        <div className="current-operand"> {currentOperand} </div>
+        <div className="previous-operand"> {formatOperand(previousOperand)} {operation} </div>
+        <div className="current-operand"> {formatOperand(currentOperand)} </div>
       </div>
-      <button 
-      className="span-two" 
+
+      <button className="span-two" 
       onClick={() => dispatch({type: ACTIONS.CLEAR})}> AC </button>
-      <button> DEL </button>
+
+      <button onClick={() => dispatch({type: ACTIONS.DELETE_DIGIT})}> DEL </button>
+      
       <Operationbutton operation="÷" dispatch={dispatch}/> 
       <Digitbutton digit="1" dispatch={dispatch}/>
       <Digitbutton digit="2" dispatch={dispatch}/>
@@ -77,9 +159,8 @@ function App() {
       <Operationbutton operation="-" dispatch={dispatch}/>
       <Digitbutton digit="." dispatch={dispatch}/>
       <Digitbutton digit="0" dispatch={dispatch}/>
-      <Operationbutton operation="=" dispatch={dispatch}/>
+      <button className="span-two" onClick={() => dispatch({type: ACTIONS.EVALUATE})}> = </button>
     </div>
-
   );
 }
 export default App;
