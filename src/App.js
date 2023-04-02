@@ -3,7 +3,6 @@ import './styles.css'
 import Digitbutton from "./Digitbutton"
 import { useReducer } from 'react'
 import Operationbutton from "./Operationbutton"
-import joey from './images/joey.jpg'
 
 
 
@@ -162,7 +161,6 @@ function App() {
       <Digitbutton digit                                            = "." dispatch={dispatch}/>
       <Digitbutton digit                                            = "0" dispatch={dispatch}/>
       <button className                                             = "span-two" onClick={() => dispatch({type: ACTIONS.EVALUATE})}> = </button>
-      <div className                                                = "joey"> <img src={joey} alt="this is my friend" /> </div>
     </div>
     
   );
