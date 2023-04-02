@@ -22,6 +22,17 @@ background: linear-gradient(to right, #00AAff, #00FF6C);
     border: 1px solid white;
     outline: none;
     background-color: rgba(255, 255, 255, .75);
+    justify-content: center;
+}
+
+.joey{
+    display: flex;
+    justify-content: center;
+    margin: auto;
+    align-items: center;
+    height: 300vh;
+    left: auto;
+    right: 50vh;
 }
 
 .calc-grid > button:hover,
